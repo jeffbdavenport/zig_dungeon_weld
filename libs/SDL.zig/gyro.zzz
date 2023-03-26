@@ -1,0 +1,9 @@
+pkgs:
+  sdl:
+    version: 0.0.0
+    description: "A shallow wrapper around SDL that provides object API and error handling"
+    license: MIT
+    tags:
+      sdl
+
+    root: src/sdl.zig

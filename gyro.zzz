@@ -1,0 +1,9 @@
+pkgs:
+  dungeon_weld:
+    version: 0.0.0
+    description: 2D Multiplayer Game Engine
+    root: src/main.zig
+deps:
+  sdl:
+    local: libs/SDL.zig
+    root: src/sdl.zig
