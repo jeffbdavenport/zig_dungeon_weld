@@ -34,26 +34,26 @@ fn getTime() u64 {
 }
 
 pub fn toF(int: anytype) f32 {
-    return @intToFloat(f32, int);
+    return @floatFromInt(f32, int);
 }
 
 pub fn toU(float: anytype) u16 {
-    return @floatToInt(u16, float);
+    return @floatFromInt(u16, float);
 }
 pub fn toUSize(float: anytype) usize {
-    return @floatToInt(usize, float);
+    return @floatFromInt(usize, float);
 }
 
 pub fn toU8(float: anytype) u8 {
-    return @floatToInt(u8, float);
+    return @floatFromInt(u8, float);
 }
 
 pub fn toI(float: anytype) i16 {
-    return @floatToInt(i16, float);
+    return @floatFromInt(i16, float);
 }
 
 pub fn toI8(float: anytype) i8 {
-    return @floatToInt(i8, float);
+    return @floatFromInt(i8, float);
 }
 
 pub fn Size(comptime T: type) type {
