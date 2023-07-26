@@ -11,20 +11,28 @@ const world = main.world;
 const p = main.p;
 const nanotime = main.nanotime;
 const Timesync = main.Timesync;
+const Size = main.Size;
+const toUSize = main.toUSize;
+const toF = main.toF;
+const toI = main.toI;
 // pub const io_mode = .evented;
+
+pub var exit = false;
+pub var texture: SDL.Texture = undefined;
 
 sdl: SDL.Window,
 renderer: Renderer,
-exit: bool = false,
 
-pub fn run(self: *@This(), texture: *SDL.Texture) !void {
+pub fn run(self: *@This()) !void {
     devices.initKeyboard(self);
+    try self.renderer.spawn(self);
     var physics = world.PhysicsProcess.create(self);
     try physics.spawn();
 
-    while (!self.exit) {
+    while (!exit) {
         try devices.Keyboard.pollEvents();
-        try self.renderer.renderFrame(texture);
+        try self.renderer.drawFrame();
+        std.time.sleep(50 * std.time.ns_per_us);
     }
 }
 
@@ -35,7 +43,7 @@ pub fn cleanup(self: *@This()) void {
     SDL.quit();
 }
 
-pub fn create(title: [:0]const u8, width: usize, height: usize) !@This() {
+pub fn create(title: [:0]const u8, size: Size(f32), render_size: Size(f32)) !@This() {
     try SDL.init(.{
         .video = true,
         .audio = true,
@@ -45,22 +53,69 @@ pub fn create(title: [:0]const u8, width: usize, height: usize) !@This() {
         title,
         .{ .centered = {} },
         .{ .centered = {} },
-        width,
-        height,
-        .{ .vis = .shown },
+        toUSize(size.width),
+        toUSize(size.height),
+        .{ .vis = .shown, .resizable = true },
     );
-    var renderer = try createRenderer(&sdl);
-    return @This(){
+
+    const render_rect = .{ .x = 0, .y = 0, .width = toI(size.width), .height = toI(size.height) };
+    var window = @This(){
         .sdl = sdl,
-        .renderer = renderer,
+        .renderer = try createRenderer(&sdl, render_size, render_rect),
+    };
+    window.setRenderRect();
+
+    return window;
+}
+
+fn createRenderer(window: *SDL.Window, size: Size(f32), rect: SDL.Rectangle) !display.Renderer {
+    const sdl = try SDL.createRenderer(window, null, .{ .accelerated = true });
+    var r_texture = try SDL.createTexture(sdl, SDL.PixelFormatEnum.rgba8888, SDL.Texture.Access.target, toUSize(size.width), toUSize(size.height));
+    try r_texture.setBlendMode(SDL.BlendMode.blend);
+    try sdl.setTarget(r_texture);
+    texture = r_texture;
+
+    return display.Renderer{
+        .sdl = sdl,
+        .rect = rect,
+        .size = size,
+        .texture = r_texture,
     };
 }
 
-fn createRenderer(window: *SDL.Window) !Renderer {
-    // const sdl = try SDL.createRenderer(window, null, .{ .accelerated = true });
-    // try sdl.setColorRGB(0xF7, 0xA4, 0x1D);
-    return Renderer{
-        .sdl = try SDL.createRenderer(window, null, .{ .accelerated = true }),
+pub fn setRenderRect(self: *@This()) void {
+    self.renderer.rect = self.getRenderRect();
+}
+
+pub fn getRenderRect(self: *@This()) SDL.Rectangle {
+    const size = self.sdl.getWindowSize();
+
+    const ratio = toF(size.width) / toF(size.height);
+    const render_ratio = self.renderer.size.width / self.renderer.size.height;
+    var x: c_int = 0;
+    var y: c_int = 0;
+
+    const height = if (ratio < render_ratio)
+        toI(toF(size.width) / render_ratio)
+    else
+        size.height;
+
+    const width = if (ratio < render_ratio)
+        size.width
+    else
+        toI(toF(size.height) * render_ratio);
+
+    if (ratio > render_ratio) {
+        x = toI(toF(size.width - width) / 2);
+    } else {
+        y = toI(toF(size.height - height) / 2);
+    }
+
+    return SDL.Rectangle{
+        .x = x,
+        .y = y,
+        .width = width,
+        .height = height,
     };
 }
 

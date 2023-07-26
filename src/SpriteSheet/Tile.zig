@@ -20,8 +20,8 @@ tex: Coords,
 const full_color = SDL.Color.rgb(255, 255, 255);
 
 pub fn new(sprite_sheet: *const SpriteSheet, row: u16, col: u16) @This() {
-    const x_start = sprite_sheet.toX(col);
-    const y_start = sprite_sheet.toY(row);
+    const x_start = sprite_sheet.texToX(col);
+    const y_start = sprite_sheet.texToY(row);
     const x_divide = sprite_sheet.size.width;
     const y_divide = sprite_sheet.size.height;
 
@@ -51,6 +51,25 @@ pub fn positionCoords(self: *const @This(), position: SDL.PointF) Coords {
 }
 
 pub fn vertices(self: *const @This(), to_position: SDL.PointF) [4]SDL.Vertex {
+    // Tex
+    // 0 1
+    // 0 0
+    // 1 0
+    // 1 1
+    // Full Image
+    // .position = .{ .x = 0, .y = img_height },
+    // .tex_coord = .{ .x = 0, .y = 1 },
+    //
+    // .position = .{ .x = 0, .y = 0 },
+    // .tex_coord = .{ .x = 0, .y = 0 },
+    //
+    // .position = .{ .x = img_width, .y = 0 },
+    // .tex_coord = .{ .x = 1, .y = 0 },
+    //
+    // .position = .{ .x = img_width, .y = img_height },
+    // .tex_coord = .{ .x = 1, .y = 1 },
+    //
+    // &[_]u32{ 0, 1, 2, 0, 2, 3 },
     const position = self.positionCoords(to_position);
     return [4]SDL.Vertex{
         .{

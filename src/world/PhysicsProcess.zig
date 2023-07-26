@@ -38,7 +38,7 @@ pub fn spawn(self: *@This()) !void {
 fn loop(self: *@This()) !void {
     var sync = Timesync.new(std.time.ns_per_s / @as(u64, target_tps));
     var one_second_sync = Timesync.new(std.time.ns_per_s);
-    while (!self.window.exit) {
+    while (!display.Window.exit) {
         _elapsed_ns = nanotime();
         sync.sleepSync(_elapsed_ns);
         ticks += 1;

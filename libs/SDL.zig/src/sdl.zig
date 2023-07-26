@@ -5,8 +5,10 @@ const expectError = std.testing.expectError;
 
 /// Exports the C interface for SDL
 pub const c = @cImport({
-    @cInclude("C:\\Users\\Jeff\\include\\SDL2\\SDL.h");
-    @cInclude("C:\\Users\\Jeff\\include\\SDL2\\SDL_image.h");
+    // @cInclude("C:\\Users\\Jeff\\include\\SDL2\\SDL.h");
+    // @cInclude("C:\\Users\\Jeff\\include\\SDL2\\SDL_image.h");
+    @cInclude("SDL2/SDL.h");
+    @cInclude("SDL2/SDL_image.h");
 });
 
 pub const image = @import("image.zig");
@@ -415,6 +417,13 @@ pub const Window = struct {
             return makeError();
         }
         return info;
+    }
+
+    pub fn getWindowSize(w: Window) Size {
+        var width: c_int = undefined;
+        var height: c_int = undefined;
+        c.SDL_GetWindowSize(w.ptr, &width, &height);
+        return Size{ .width = width, .height = height };
     }
 };
 
@@ -830,6 +839,16 @@ pub const Renderer = struct {
         var vp = rect;
         if (c.SDL_RenderSetViewport(ren.ptr, vp.getSdlPtr()) < 0)
             return makeError();
+    }
+
+    pub fn getTarget(ren: Renderer) ?Texture {
+        const texptr = c.SDL_GetRenderTarget(ren.ptr);
+        if (texptr == null)
+            return null;
+
+        return Texture{
+            .ptr = texptr.?,
+        };
     }
 
     pub fn setTarget(ren: Renderer, tex: ?Texture) !void {

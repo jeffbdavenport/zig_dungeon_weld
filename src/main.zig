@@ -1,6 +1,8 @@
 pub const std = @import("std");
-pub const print = std.debug.print;
 pub const SDL = @import("sdl");
+pub const ziglyph = @import("ziglyph");
+pub const print = std.debug.print;
+pub const Game = @import("Game.zig");
 pub const display = @import("display/mod.zig");
 pub const devices = @import("devices/mod.zig");
 pub const event = @import("event/mod.zig");
@@ -38,6 +40,9 @@ pub fn toF(int: anytype) f32 {
 pub fn toU(float: anytype) u16 {
     return @floatToInt(u16, float);
 }
+pub fn toUSize(float: anytype) usize {
+    return @floatToInt(usize, float);
+}
 
 pub fn toU8(float: anytype) u8 {
     return @floatToInt(u8, float);
@@ -50,3 +55,12 @@ pub fn toI(float: anytype) i16 {
 pub fn toI8(float: anytype) i8 {
     return @floatToInt(i8, float);
 }
+
+pub fn Size(comptime T: type) type {
+    return struct {
+        width: T,
+        height: T,
+    };
+}
+
+pub const Error = SDL.Error || display.Geometry.Error || std.mem.Allocator.Error || std.Thread.SpawnError;

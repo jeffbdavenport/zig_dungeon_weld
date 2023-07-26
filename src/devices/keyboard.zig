@@ -20,13 +20,22 @@ const Impl = struct {
         while (SDL.pollEvent()) |ev| {
             switch (ev) {
                 .quit, .app_terminating => {
-                    self.window.exit = true;
+                    display.Window.exit = true;
                     break;
+                },
+                .window => {
+                    switch (ev.window.type) {
+                        .resized => {
+                            self.window.setRenderRect();
+                            // p("Resized", .{});
+                        },
+                        else => {},
+                    }
                 },
                 .key_down => |key| {
                     switch (key.scancode) {
                         .q => {
-                            self.window.exit = true;
+                            display.Window.exit = true;
                             break;
                         },
                         else => p("Pressed key: {}", .{key.scancode}),

@@ -7,3 +7,6 @@ deps:
   sdl:
     local: libs/SDL.zig
     root: src/sdl.zig
+  ziglyph:
+    local: libs/ziglyph
+    root: src/ziglyph.zig
