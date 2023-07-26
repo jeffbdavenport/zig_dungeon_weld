@@ -1,2 +1,3 @@
 2
 git https://github.com/jecolon/ziglyph.git commit-1201bf393a9c8ae4e1564d01e4e4d9377e2c89de
+git https://github.com/jeffbdavenport/SDL.zig commit-c099779fc2bfa031875424027648d218d8f0c67a

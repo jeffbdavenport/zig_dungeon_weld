@@ -6,5 +6,7 @@ description: 2D MMO Game Engine Lib
 build_dependencies:
 root_dependencies:
   - src: git https://github.com/jecolon/ziglyph.git
+  - src: git https://github.com/jeffbdavenport/SDL.zig
+  # - src: git https://github.com/MasterQ32/SDL.zig
   # - src: local libs/ziglyph/src/ziglyph.zig
   # - src: local ../SDL.zig/src/wrapper/sdl.zig
