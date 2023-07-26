@@ -102,7 +102,7 @@ pub const package_data = struct {
     };
     pub var _r5hwws1i0u5g = Package{
         .directory = dirs._r5hwws1i0u5g,
-        .pkg = Pkg{ .name = "SDL.zig", .source = .{ .path = dirs._r5hwws1i0u5g ++ "/src/sdl.zig" }, .dependencies = &.{} },
+        .pkg = Pkg{ .name = "sdl", .source = .{ .path = dirs._r5hwws1i0u5g ++ "/src/sdl.zig" }, .dependencies = &.{} },
     };
     pub var _root = Package{
         .directory = dirs._root,
@@ -118,7 +118,7 @@ pub const packages = &[_]*Package{
 pub const pkgs = struct {
     pub const dungeon_weld = &package_data._i1yufq9oyy49;
     pub const ziglyph = &package_data._l21900j9ct9e;
-    pub const SDL_zig = &package_data._r5hwws1i0u5g;
+    pub const sdl = &package_data._r5hwws1i0u5g;
 };
 
 pub const imports = struct {
