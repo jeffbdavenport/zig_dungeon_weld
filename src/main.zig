@@ -1,6 +1,6 @@
 pub const std = @import("std");
-pub const SDL = @import("sdl");
 pub const ziglyph = @import("ziglyph");
+pub const SDL = @import("libs/SDL.zig/sdl.zig");
 pub const print = std.debug.print;
 pub const Game = @import("Game.zig");
 pub const display = @import("display/mod.zig");

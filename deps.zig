@@ -102,7 +102,7 @@ pub const package_data = struct {
     };
     pub var _r5hwws1i0u5g = Package{
         .directory = dirs._r5hwws1i0u5g,
-        .pkg = Pkg{ .name = "sdl", .source = .{ .path = dirs._r5hwws1i0u5g ++ "/src/sdl.zig" }, .dependencies = &.{} },
+        .pkg = Pkg{ .name = "sdl", .source = .{ .path = dirs._r5hwws1i0u5g ++ "/src/binding/sdl.zig" }, .dependencies = &.{} },
     };
     pub var _root = Package{
         .directory = dirs._root,
