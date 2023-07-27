@@ -14,8 +14,7 @@ pub fn run() void {}
 
 pub var server = false;
 
-// pub fn init(title: [:0]const u8, size: Size(f32), render_size: Size(f32), game_function: fn (@This()) void, client_function: fn (Window, *Renderer) Error!void, server_function: fn () void) !void {
-pub fn init(title: [:0]const u8, size: Size(f32), render_size: Size(f32), client_function: fn (Window, *Renderer) Error!void, server_function: fn () void) !void {
+pub fn init(title: [:0]const u8, size: Size(f32), render_size: Size(f32), game_function: fn (@This()) void, client_function: fn (Window, *Renderer) Error!void, server_function: fn () void) !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
     var allocator = arena.allocator();
     var args = try std.process.argsWithAllocator(allocator);
@@ -35,8 +34,7 @@ pub fn init(title: [:0]const u8, size: Size(f32), render_size: Size(f32), client
     arena.deinit();
 
     const game = @This().new();
-    _ = game;
-    // game_function(game);
+    game_function(game);
 
     if (server) {
         server_function();
