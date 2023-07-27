@@ -2,10 +2,7 @@ const SDL = @import("sdl.zig");
 const std = @import("std");
 
 /// Exports the C interface for SDL_image
-pub const c = @cImport({
-    @cInclude("SDL2/SDL.h");
-    @cInclude("SDL2/SDL_image.h");
-});
+pub const c = @import("sdl-native");
 
 pub const InitFlags = packed struct {
     jpg: bool = false, // IMG_INIT_JPG = 1,
@@ -15,7 +12,7 @@ pub const InitFlags = packed struct {
 };
 
 pub fn init(flags: InitFlags) !void {
-    if (c.IMG_Init(@bitCast(u4, flags)) < 0)
+    if (c.IMG_Init(@as(u4, @bitCast(flags))) < 0)
         return error.SdlError;
 }
 
@@ -41,23 +38,23 @@ test "platform independent declarations" {
 
 pub const ImgFormat = enum { png, jpg, bmp };
 
-// pub fn loadTextureMem(ren: *const SDL.Renderer, img: [:0]const u8, format: ImgFormat) !SDL.Texture {
-//     const rw = c.SDL_RWFromConstMem(
-//         @ptrCast(*const anyopaque, &img[0]),
-//         @intCast(c_int, img.len),
-//     ) orelse return SDL.makeError();
+pub fn loadTextureMem(ren: SDL.Renderer, img: [:0]const u8, format: ImgFormat) !SDL.Texture {
+    const rw = c.SDL_RWFromConstMem(
+        @ptrCast(&img[0]),
+        @intCast(img.len),
+    ) orelse return SDL.makeError();
 
-//     defer std.debug.assert(c.SDL_RWclose(rw) == 0);
+    defer std.debug.assert(c.SDL_RWclose(rw) == 0);
 
-//     var surface: *c.SDL_Surface = undefined;
-//     switch (format) {
-//         .png => surface = c.IMG_LoadPNG_RW(rw) orelse return SDL.makeError(),
-//         .jpg => surface = c.IMG_LoadJPG_RW(rw) orelse return SDL.makeError(),
-//         .bmp => surface = c.IMG_LoadBMP_RW(rw) orelse return SDL.makeError(),
-//     }
-//     defer c.SDL_FreeSurface(surface);
+    var surface: *c.SDL_Surface = undefined;
+    switch (format) {
+        .png => surface = c.IMG_LoadPNG_RW(rw) orelse return SDL.makeError(),
+        .jpg => surface = c.IMG_LoadJPG_RW(rw) orelse return SDL.makeError(),
+        .bmp => surface = c.IMG_LoadBMP_RW(rw) orelse return SDL.makeError(),
+    }
+    defer c.SDL_FreeSurface(surface);
 
-//     return SDL.Texture{
-//         .ptr = c.SDL_CreateTextureFromSurface(ren.ptr, surface) orelse return SDL.makeError(),
-//     };
-// }
+    return SDL.Texture{
+        .ptr = c.SDL_CreateTextureFromSurface(ren.ptr, surface) orelse return SDL.makeError(),
+    };
+}
