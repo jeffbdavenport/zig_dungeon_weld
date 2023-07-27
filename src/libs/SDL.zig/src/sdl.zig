@@ -4,7 +4,13 @@ const expectEqual = std.testing.expectEqual;
 const expectError = std.testing.expectError;
 
 /// Exports the C interface for SDL
-pub const c = @import("sdl-native");
+/// Exports the C interface for SDL
+pub const c = @cImport({
+    // @cInclude("C:\\Users\\Jeff\\include\\SDL2\\SDL.h");
+    // @cInclude("C:\\Users\\Jeff\\include\\SDL2\\SDL_image.h");
+    @cInclude("SDL2/SDL.h");
+    @cInclude("SDL2/SDL_image.h");
+});
 
 pub const image = @import("image.zig");
 pub const ttf = @import("ttf.zig");
