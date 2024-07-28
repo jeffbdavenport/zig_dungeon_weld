@@ -1,4 +1,4 @@
-const sdl = @import("sdl.zig");
+const sdl = @import("main.zig");
 const std = @import("std");
 
 pub const Context = struct {
@@ -49,12 +49,12 @@ pub fn getDrawableSize(window: sdl.Window) struct { w: u32, h: u32 } {
     var w: c_int = undefined;
     var h: c_int = undefined;
     sdl.c.SDL_GL_GetDrawableSize(window.ptr, &w, &h);
-    return .{ .w = @intCast(u32, w), .h = @intCast(u32, h) };
+    return .{ .w = @as(u32, @intCast(w)), .h = @as(u32, @intCast(h)) };
 }
 
 fn attribValueToInt(value: anytype) c_int {
     return switch (@TypeOf(value)) {
-        usize => @intCast(c_int, value),
+        usize => @as(c_int, @intCast(value)),
         bool => if (value) @as(c_int, 1) else 0,
         ContextFlags => blk: {
             var result: c_int = 0;
@@ -73,7 +73,7 @@ fn attribValueToInt(value: anytype) c_int {
 
             break :blk result;
         },
-        Profile, ReleaseBehaviour => @enumToInt(value),
+        Profile, ReleaseBehaviour => @intFromEnum(value),
         else => @compileError("Unsupported type for sdl.gl.Attribute"),
     };
 }
@@ -82,7 +82,7 @@ pub fn setAttribute(attrib: Attribute) !void {
     inline for (std.meta.fields(Attribute)) |fld| {
         if (attrib == @field(AttributeName, fld.name)) {
             const res = sdl.c.SDL_GL_SetAttribute(
-                @intCast(sdl.c.SDL_GLattr, @enumToInt(attrib)),
+                @as(sdl.c.SDL_GLattr, @intCast(@intFromEnum(attrib))),
                 attribValueToInt(@field(attrib, fld.name)),
             );
             if (res != 0) {

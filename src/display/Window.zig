@@ -23,14 +23,18 @@ pub var texture: SDL.Texture = undefined;
 sdl: SDL.Window,
 renderer: Renderer,
 
-pub fn run(self: *@This()) !void {
-    devices.initKeyboard(self);
-    try self.renderer.spawn(self);
+pub fn run(self: *@This(), renderPrepFunc: fn () main.Error!void, physicsFunc: fn () main.Error!void, eventFunc: fn (SDL.Event) main.Error!void) !void {
+    // devices.initKeyboard(self);
+    const thread1 = try std.Thread.spawn(.{}, display.Renderer.renderLoop, .{ &self.renderer, renderPrepFunc });
+    thread1.detach();
     var physics = world.PhysicsProcess.create(self);
-    try physics.spawn();
+    const thread2 = try std.Thread.spawn(.{}, world.PhysicsProcess.loop, .{ &physics, physicsFunc });
+    thread2.detach();
+    const thread3 = try std.Thread.spawn(.{}, devices.Event.loop, .{eventFunc});
+    thread3.detach();
 
     while (!exit) {
-        try devices.Keyboard.pollEvents();
+        try devices.Event.pollEvents(self);
         try self.renderer.drawFrame();
         std.time.sleep(50 * std.time.ns_per_us);
     }
@@ -43,6 +47,7 @@ pub fn cleanup(self: *@This()) void {
     SDL.quit();
 }
 
+// Create the SDL.Window and SDL.Renderer and return a display.Window object that contains both
 pub fn create(title: [:0]const u8, size: Size(f32), render_size: Size(f32)) !@This() {
     try SDL.init(.{
         .video = true,
@@ -87,6 +92,7 @@ pub fn setRenderRect(self: *@This()) void {
     self.renderer.rect = self.getRenderRect();
 }
 
+// Get render size based off of window size.
 pub fn getRenderRect(self: *@This()) SDL.Rectangle {
     const size = self.sdl.getWindowSize();
 

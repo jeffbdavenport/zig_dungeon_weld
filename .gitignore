@@ -1,5 +1,6 @@
 zig-out
 zig-cache
+.zig-cache
 src/assets
 .zigmod
 deps.zig

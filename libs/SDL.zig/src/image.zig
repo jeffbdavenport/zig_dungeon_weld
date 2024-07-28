@@ -1,10 +1,12 @@
-const SDL = @import("sdl.zig");
+const SDL = @import("main.zig");
 const std = @import("std");
 
 /// Exports the C interface for SDL_image
 pub const c = @cImport({
-    @cInclude("SDL2/SDL.h");
-    @cInclude("SDL2/SDL_image.h");
+    @cInclude("C:\\Users\\Jeff\\include\\SDL2\\SDL.h");
+    @cInclude("C:\\Users\\Jeff\\include\\SDL2\\SDL_image.h");
+    // @cInclude("SDL2/SDL.h");
+    // @cInclude("SDL2/SDL_image.h");
 });
 
 pub const InitFlags = packed struct {
@@ -15,7 +17,7 @@ pub const InitFlags = packed struct {
 };
 
 pub fn init(flags: InitFlags) !void {
-    if (c.IMG_Init(@bitCast(u4, flags)) < 0)
+    if (c.IMG_Init(@as(u4, @bitCast(flags))) < 0)
         return error.SdlError;
 }
 

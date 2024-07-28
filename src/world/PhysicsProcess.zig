@@ -30,12 +30,8 @@ pub fn create(self: *display.Window) @This() {
     return @This(){ .window = self };
 }
 
-pub fn spawn(self: *@This()) !void {
-    const thread = try std.Thread.spawn(.{}, loop, .{self});
-    thread.detach();
-}
-
-fn loop(self: *@This()) !void {
+pub fn loop(self: *@This(), physics_func: fn () main.Error!void) !void {
+    _ = self;
     var sync = Timesync.new(std.time.ns_per_s / @as(u64, target_tps));
     var one_second_sync = Timesync.new(std.time.ns_per_s);
     while (!display.Window.exit) {
@@ -46,8 +42,6 @@ fn loop(self: *@This()) !void {
             tps = sync.getFrames();
         }
 
-        self.process();
+        try physics_func();
     }
 }
-
-fn process(_: *@This()) void {}

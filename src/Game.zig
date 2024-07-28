@@ -14,21 +14,21 @@ pub fn run() void {}
 
 pub var server = false;
 
-pub fn init(title: [:0]const u8, size: Size(f32), render_size: Size(f32), game_function: fn (@This()) void, client_function: fn (Window, *Renderer) Error!void, server_function: fn () void) !void {
+pub fn init(title: [:0]const u8, size: Size(f32), render_size: Size(f32), comptime game_function: fn (@This()) void, comptime client_function: fn (Window, *Renderer) Error!void, comptime server_function: fn () void) !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
-    var allocator = arena.allocator();
+    const allocator = arena.allocator();
     var args = try std.process.argsWithAllocator(allocator);
 
     // Skip exe path
     _ = args.next();
-    if (args.next()) |arg| {
-        const lower = try ziglyph.toLowerStr(allocator, arg);
-        defer allocator.free(lower);
-        if (std.mem.eql(u8, lower, "server")) {
-            p("Starting {s} multiplayer server...", .{title});
-            server = true;
-        }
-    }
+    // if (args.next()) |arg| {
+    //     const lower = try ziglyph.toLowerStr(allocator, arg);
+    //     defer allocator.free(lower);
+    //     if (std.mem.eql(u8, lower, "server")) {
+    //         p("Starting {s} multiplayer server...", .{title});
+    //         server = true;
+    //     }
+    // }
     // Done with args
     args.deinit();
     arena.deinit();

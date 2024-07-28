@@ -28,8 +28,8 @@ pub fn new(tile: Tile, renderer: *display.Renderer) !@This() {
         }
     }
 
-    var texture = try SDL.createTexture(renderer.sdl, SDL.PixelFormatEnum.rgba8888, SDL.Texture.Access.target, toUSize(renderer.size.width), toUSize(renderer.size.height));
-    var prev = renderer.sdl.getTarget();
+    const texture = try SDL.createTexture(renderer.sdl, SDL.PixelFormatEnum.rgba8888, SDL.Texture.Access.target, toUSize(renderer.size.width), toUSize(renderer.size.height));
+    const prev = renderer.sdl.getTarget();
     try renderer.sdl.setTarget(texture);
 
     try renderer.sdl.drawGeometry(

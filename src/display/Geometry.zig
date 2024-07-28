@@ -23,7 +23,7 @@ pub fn addTile(self: *@This(), tile: SpriteSheet.Tile, position: SDL.PointF) !vo
     if (tile.sprite_sheet.texture != self.texture)
         return Error.TileNotInTexture;
 
-    const add_index: u32 = @intCast(u32, self.vertices.items.len);
+    const add_index: u32 = @as(u32, @intCast(self.vertices.items.len));
     try self.vertices.appendSlice(&tile.vertices(position));
     try self.indices.appendSlice(&.{ 0 + add_index, 1 + add_index, 2 + add_index, 0 + add_index, 2 + add_index, 3 + add_index });
 }
@@ -34,7 +34,7 @@ pub fn deinit(self: *@This()) void {
 }
 
 pub fn import(self: *@This(), other: @This()) !void {
-    var add_index: u32 = @intCast(u32, self.vertices.items.len);
+    const add_index: u32 = @as(u32, @intCast(self.vertices.items.len));
 
     try self.vertices.appendSlice(other.vertices.items);
 

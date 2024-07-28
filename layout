@@ -1,0 +1,23 @@
+struct definitions:
+  Game - Allows binary to run both client and server code based on argument
+  Timesync - Sleep for a very specific amount of time in a loop
+  SpriteSheet - Container that holds all sprite Tiles:
+    Tile - a single sprite cut out of a SpriteSheet:
+      Coord - A point in the world
+      Coords - Diagnal points that make a square
+  display:
+    Background - Uses single Tile with a Geometry to add that tile to every position on the screen to make up a full background based on render size
+    Geometry - Containes tiles and their order and positions to be printed to a screen frame
+    Renderer - Contains all logic for printing the game screen using Geometry textures
+    Window - Containes SDL Renderer and Window - calculating Render size from Window size as well as main game loop run()
+  devices:
+    Keyboard - Captures named keybinding keys down and pressed
+  world:
+    PhysicsProcess - Any logic related to physics, including main physics loop
+
+files:
+  main - global one line function declarations
+  mod.zig - const definitions for file structs
+
+
+functions:
