@@ -24,11 +24,13 @@ pub fn eq(self: @This(), other: @This()) bool {
     return std.mem.eql(u32, self.indices.items, other.indices.items);
 }
 
+// Clear out all vertices
 pub fn reset(self: *@This()) !void {
     try self.vertices.resize(0);
     try self.indices.resize(0);
 }
 
+// Keeps track if this needs to be redrawn
 pub fn hasUpdated(self: *@This()) bool {
     const u = self.updated;
     self.updated = false;
@@ -45,6 +47,7 @@ pub fn new(arena: *std.heap.ArenaAllocator, texture: *SDL.Texture) @This() {
     };
 }
 
+// Add a Tile and it's position to the Geometry to be drawn
 pub fn addTile(self: *@This(), tile: SpriteSheet.Tile, position: SDL.PointF) !void {
     if (tile.sprite_sheet.texture != self.texture)
         return Error.TileNotInTexture;
@@ -60,6 +63,7 @@ pub fn deinit(self: *@This()) void {
     self.indices.deinit();
 }
 
+// Combine two Geometries into one
 pub fn import(self: *@This(), other: @This()) !void {
     const add_index: u32 = @as(u32, @intCast(self.vertices.items.len));
 

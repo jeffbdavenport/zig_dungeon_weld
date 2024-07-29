@@ -19,7 +19,7 @@ tex: Coords,
 
 const full_color = SDL.Color.rgb(255, 255, 255);
 
-pub fn new(sprite_sheet: *const SpriteSheet, row: u16, col: u16) @This() {
+pub fn new(sprite_sheet: *const SpriteSheet, col: u16, row: u16) @This() {
     const x_start = sprite_sheet.texToX(col);
     const y_start = sprite_sheet.texToY(row);
     const x_divide = sprite_sheet.size.width;

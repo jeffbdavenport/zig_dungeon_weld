@@ -34,7 +34,7 @@ pub fn new(texture: *SDL.Texture, tile: Size(u8), padding: u8, scale: f32, flip:
     } };
 }
 
-pub fn rowColPosition(self: *const @This(), row: u16, col: u16) SDL.PointF {
+pub fn colRowPosition(self: *const @This(), col: u16, row: u16) SDL.PointF {
     return .{ .x = self.toX(col), .y = self.toY(row) };
 }
 
@@ -54,6 +54,6 @@ pub fn texToY(self: *const @This(), row: u16) f32 {
     return (toF(row) * self.spacing.height) + self.padding;
 }
 
-pub fn newTile(self: *const @This(), row: u16, col: u16) Tile {
-    return Tile.new(self, row, col);
+pub fn newTile(self: *const @This(), col: u16, row: u16) Tile {
+    return Tile.new(self, col, row);
 }

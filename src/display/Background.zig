@@ -24,7 +24,7 @@ pub fn new(tile: Tile, renderer: *display.Renderer) !@This() {
     while (row < rows) : (row += 1) {
         var col: u16 = 0;
         while (col < cols) : (col += 1) {
-            try geometry.addTile(tile, tile.sprite_sheet.rowColPosition(row, col));
+            try geometry.addTile(tile, tile.sprite_sheet.colRowPosition(col, row));
         }
     }
 

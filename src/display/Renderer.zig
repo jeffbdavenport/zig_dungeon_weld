@@ -4,6 +4,7 @@ const std = main.std;
 
 const display = main.display;
 const world = main.world;
+const event = main.event;
 const SpriteSheet = main.SpriteSheet;
 
 const p = main.p;
@@ -71,7 +72,7 @@ pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
             fps = frames;
             frames = 0;
             if (print_fps) {
-                p("FPS: {}, TPS: {}, seconds elapsed: {}", .{ fps, world.PhysicsProcess.tps, elapsedS() });
+                p("FPS: {}, TPS: {}, seconds elapsed: {}", .{ fps, event.PhysicsProcess.tps, elapsedS() });
             }
         }
     }
@@ -84,7 +85,8 @@ pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
         // self.geometry.deinit();
 
         // if (self.prep) {
-        //     self.prev_geometry = self.geometry;
+        //     self.prev_geometry = self.geometry
+
         //     self.prep = false;
         // }
         //try self.render();

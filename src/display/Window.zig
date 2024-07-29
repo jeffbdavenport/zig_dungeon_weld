@@ -27,8 +27,8 @@ pub fn run(self: *@This(), renderPrepFunc: fn () main.Error!void, physicsFunc: f
     // devices.initKeyboard(self);
     const thread1 = try std.Thread.spawn(.{}, display.Renderer.renderLoop, .{ &self.renderer, renderPrepFunc });
     thread1.detach();
-    var physics = world.PhysicsProcess.create(self);
-    const thread2 = try std.Thread.spawn(.{}, world.PhysicsProcess.loop, .{ &physics, physicsFunc });
+    var physics = event.PhysicsProcess.create(self);
+    const thread2 = try std.Thread.spawn(.{}, event.PhysicsProcess.loop, .{ &physics, physicsFunc });
     thread2.detach();
     const thread3 = try std.Thread.spawn(.{}, devices.Event.loop, .{eventFunc});
     thread3.detach();
