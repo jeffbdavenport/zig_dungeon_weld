@@ -40,15 +40,18 @@ pub fn elapsedS() u64 {
 var arena: std.heap.ArenaAllocator = undefined;
 
 geometry: display.Geometry = undefined,
+prev_geometry: display.Geometry = undefined,
 sdl: SDL.Renderer,
 draw: bool = false,
 size: Size(f32),
 background: ?display.Background = null,
 rect: SDL.Rectangle,
 texture: SDL.Texture,
+prep: bool = true,
 // render_func: fn () main.Error!void = render,
 
 pub fn cleanup(self: *@This()) void {
+    arena.deinit();
     self.sdl.destroy();
 }
 
@@ -56,6 +59,9 @@ pub fn cleanup(self: *@This()) void {
 pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
     var render_sync = Timesync.new(std.time.ns_per_s / @as(u64, target_fps));
     var one_second = Timesync.new(std.time.ns_per_s);
+
+    arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
+    self.geometry = display.Geometry.new(&arena, &display.Window.texture);
 
     while (!display.Window.exit) {
         _elapsed_ns = nanotime();
@@ -73,15 +79,22 @@ pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
 
 pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
     if (!self.draw and !display.Window.exit) {
-        arena.deinit();
-        self.geometry.deinit();
-        arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
-        self.geometry = display.Geometry.new(&arena, &display.Window.texture);
+        // arena.deinit();
+        // arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
+        // self.geometry.deinit();
 
+        // if (self.prep) {
+        //     self.prev_geometry = self.geometry;
+        //     self.prep = false;
+        // }
         //try self.render();
+        try self.geometry.reset();
         try renderPrepFunc();
+        self.draw = self.geometry.hasUpdated();
 
-        self.draw = true;
+        // arena.deinit();
+        // self.prev_geometry.deinit();
+        // self.prev_geometry = self.geometry;
     }
 }
 // try self.sdl.copy(texture, SDL.Rectangle{ .x = 0, .y = 0, .width = 1092, .height = 464 }, null);

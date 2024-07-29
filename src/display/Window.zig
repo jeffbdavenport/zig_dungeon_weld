@@ -36,7 +36,7 @@ pub fn run(self: *@This(), renderPrepFunc: fn () main.Error!void, physicsFunc: f
     while (!exit) {
         try devices.Event.pollEvents(self);
         try self.renderer.drawFrame();
-        std.time.sleep(50 * std.time.ns_per_us);
+        std.time.sleep(1000 * std.time.ns_per_us);
     }
 }
 

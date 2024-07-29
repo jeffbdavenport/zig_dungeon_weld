@@ -6,8 +6,34 @@ const SpriteSheet = main.SpriteSheet;
 vertices: std.ArrayList(SDL.Vertex), // .init(allocator),
 indices: std.ArrayList(u32),
 texture: *SDL.Texture,
+updated: bool = false,
 
 pub const Error = error{TileNotInTexture};
+
+pub fn eq(self: @This(), other: @This()) bool {
+    for (self.vertices.items, 0..) |item, i| {
+        const o_item = other.vertices.items[i];
+        if (item.position.x != o_item.position.x or
+            item.position.y != o_item.position.y or
+            item.tex_coord.x != o_item.tex_coord.x or
+            item.tex_coord.y != o_item.tex_coord.y)
+        {
+            return false;
+        }
+    }
+    return std.mem.eql(u32, self.indices.items, other.indices.items);
+}
+
+pub fn reset(self: *@This()) !void {
+    try self.vertices.resize(0);
+    try self.indices.resize(0);
+}
+
+pub fn hasUpdated(self: *@This()) bool {
+    const u = self.updated;
+    self.updated = false;
+    return u;
+}
 
 pub fn new(arena: *std.heap.ArenaAllocator, texture: *SDL.Texture) @This() {
     const allocator = arena.allocator();
@@ -26,6 +52,7 @@ pub fn addTile(self: *@This(), tile: SpriteSheet.Tile, position: SDL.PointF) !vo
     const add_index: u32 = @as(u32, @intCast(self.vertices.items.len));
     try self.vertices.appendSlice(&tile.vertices(position));
     try self.indices.appendSlice(&.{ 0 + add_index, 1 + add_index, 2 + add_index, 0 + add_index, 2 + add_index, 3 + add_index });
+    self.updated = true;
 }
 
 pub fn deinit(self: *@This()) void {
