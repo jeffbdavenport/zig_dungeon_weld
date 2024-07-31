@@ -113,7 +113,6 @@ pub fn processTree(self: *@This(), node: world.Node.NodeType) !void {
             }
             if (world.Camera.active) |camera| {
                 try self.geometry.addTile(s.tile, positionAdd(camera.topLeft(), positionSub(s.node.globalPosition(), camera.node.globalPosition())));
-                // try self.geometry.addTile(s.tile, s.node.position); //globalPosition());
             } else {
                 try self.geometry.addTile(s.tile, s.node.position);
             }
@@ -123,7 +122,6 @@ pub fn processTree(self: *@This(), node: world.Node.NodeType) !void {
                 try self.processTree(item);
             }
             world.Camera.active = c;
-            // self.draw = true;
         },
     }
 }
