@@ -22,7 +22,10 @@ flip: Flip,
 pub fn new(texture: *SDL.Texture, tile: Size(u8), padding: u8, scale: f32, flip: Flip) !@This() {
     const info = try texture.query();
 
-    return @This(){ .flip = flip, .texture = texture, .tile = .{ .width = toF(tile.width), .height = toF(tile.height) }, .size = .{
+    return @This(){ .flip = flip, .texture = texture, .tile = .{
+        .width = toF(tile.width),
+        .height = toF(tile.height),
+    }, .size = .{
         .width = toF(info.width),
         .height = toF(info.height),
     }, .padding = toF(padding), .spacing = .{

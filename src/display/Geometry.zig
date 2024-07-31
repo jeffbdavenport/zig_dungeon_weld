@@ -49,8 +49,8 @@ pub fn new(arena: *std.heap.ArenaAllocator, texture: *SDL.Texture) @This() {
 
 // Add a Tile and it's position to the Geometry to be drawn
 pub fn addTile(self: *@This(), tile: SpriteSheet.Tile, position: SDL.PointF) !void {
-    if (tile.sprite_sheet.texture != self.texture)
-        return Error.TileNotInTexture;
+    // if (tile.sprite_sheet.texture != self.texture)
+    //     return Error.TileNotInTexture;
 
     const add_index: u32 = @as(u32, @intCast(self.vertices.items.len));
     try self.vertices.appendSlice(&tile.vertices(position));

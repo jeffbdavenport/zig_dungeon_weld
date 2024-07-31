@@ -9,22 +9,22 @@ const toUSize = main.toUSize;
 
 const render_size = @import("root").render_size;
 const tile_size = @import("root").tile_size;
-const cols = render_size.width / tile_size;
-const rows = render_size.height / tile_size;
+const cols = std.math.ceil(render_size.width / tile_size);
+const rows = std.math.ceil(render_size.height / tile_size);
 
 texture: SDL.Texture,
 
-pub fn new(tile: Tile, renderer: *display.Renderer) !@This() {
+pub fn new(tile: Tile, sprite_sheet: *main.SpriteSheet, renderer: *display.Renderer) !@This() {
     var arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
     defer arena.deinit();
-    var geometry = display.Geometry.new(&arena, tile.sprite_sheet.texture);
+    var geometry = display.Geometry.new(&arena, sprite_sheet.texture);
     defer geometry.deinit();
 
     var row: u16 = 0;
     while (row < rows) : (row += 1) {
         var col: u16 = 0;
         while (col < cols) : (col += 1) {
-            try geometry.addTile(tile, tile.sprite_sheet.colRowPosition(col, row));
+            try geometry.addTile(tile, sprite_sheet.colRowPosition(col, row));
         }
     }
 
@@ -33,7 +33,7 @@ pub fn new(tile: Tile, renderer: *display.Renderer) !@This() {
     try renderer.sdl.setTarget(texture);
 
     try renderer.sdl.drawGeometry(
-        tile.sprite_sheet.texture.*,
+        sprite_sheet.texture.*,
         geometry.vertices.items,
 
         geometry.indices.items,

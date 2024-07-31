@@ -59,7 +59,7 @@ pub fn cleanup(self: *@This()) void {
 }
 
 // Main loop for handling when non-printing render logic should happen (Should not need to change)
-pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!world.Node.NodeType) !void {
+pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!world.Node) !void {
     var render_sync = Timesync.new(std.time.ns_per_s / @as(u64, target_fps));
     var one_second = Timesync.new(std.time.ns_per_s);
 
@@ -79,7 +79,7 @@ pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!world.Node.No
     }
 }
 
-pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!world.Node.NodeType) !void {
+pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!world.Node) !void {
     if (!self.draw and !display.Window.exit) {
         // arena.deinit();
         // arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
@@ -92,8 +92,8 @@ pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!world.Node.No
         // }
         //try self.render();
         try self.geometry.reset();
-        const root = try renderPrepFunc();
-        try self.processTree(root);
+        var root = try renderPrepFunc();
+        try self.processTree(&root);
         self.draw = self.geometry.hasUpdated();
 
         // arena.deinit();
@@ -102,26 +102,29 @@ pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!world.Node.No
     }
 }
 
-pub fn processTree(self: *@This(), node: world.Node.NodeType) !void {
-    switch (node) {
-        .node => |n| for (n.nodes.items) |item| {
-            try self.processTree(item);
-        },
+pub fn processTree(self: *@This(), node: *world.Node) !void {
+    for (node.nodes.items) |item| {
+        try self.processTree(item);
+    }
+    switch (node.holder) {
         .sprite => |s| {
-            for (s.node.nodes.items) |item| {
-                try self.processTree(item);
-            }
             if (world.Camera.active) |camera| {
-                try self.geometry.addTile(s.tile, positionAdd(camera.topLeft(), positionSub(s.node.globalPosition(), camera.node.globalPosition())));
+                if (world.Camera.node) |c_node| {
+                    try self.geometry.addTile(s.tile, positionAdd(
+                        positionAdd(
+                            camera.topLeft(),
+                            positionSub(node.globalPosition(), c_node.globalPosition()),
+                        ),
+                        c_node.offset,
+                    ));
+                }
             } else {
-                try self.geometry.addTile(s.tile, s.node.position);
+                try self.geometry.addTile(s.tile, node.globalPosition());
             }
         },
         .camera => |c| if (world.Camera.active == null) {
-            for (c.node.nodes.items) |item| {
-                try self.processTree(item);
-            }
-            world.Camera.active = c;
+            world.Camera.active = @constCast(&c);
+            world.Camera.node = node;
         },
     }
 }

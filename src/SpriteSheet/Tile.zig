@@ -1,18 +1,21 @@
 const main = @import("../main.zig");
 const SDL = main.SDL;
 const SpriteSheet = main.SpriteSheet;
+const p = main.p;
 
 pub const Coord = struct {
-    start: f32,
-    end: f32,
+    start: f32 = 0,
+    end: f32 = 0,
 };
 
 pub const Coords = struct {
-    x: Coord,
-    y: Coord,
+    x: Coord = .{},
+    y: Coord = .{},
 };
 
-sprite_sheet: *const SpriteSheet,
+// sprite_sheet: *const SpriteSheet,
+size: main.Size(f32),
+flip: SpriteSheet.Flip,
 tex: Coords,
 
 // vertices: [4]SDL.Vertex,
@@ -25,7 +28,7 @@ pub fn new(sprite_sheet: *const SpriteSheet, col: u16, row: u16) @This() {
     const x_divide = sprite_sheet.size.width;
     const y_divide = sprite_sheet.size.height;
 
-    return @This(){ .sprite_sheet = sprite_sheet, .tex = .{
+    return @This(){ .size = sprite_sheet.print, .flip = sprite_sheet.flip, .tex = .{
         .x = .{
             .start = x_start / x_divide,
             .end = (x_start + sprite_sheet.tile.width) / x_divide,
@@ -38,15 +41,15 @@ pub fn new(sprite_sheet: *const SpriteSheet, col: u16, row: u16) @This() {
 }
 
 pub fn positionCoords(self: *const @This(), position: SDL.PointF) Coords {
-    const x_other = position.x + self.sprite_sheet.print.width;
-    const y_other = position.y + self.sprite_sheet.print.height;
+    const x_other = position.x + self.size.width;
+    const y_other = position.y + self.size.height;
 
     return Coords{ .x = .{
-        .start = if (self.sprite_sheet.flip.x) x_other else position.x,
-        .end = if (self.sprite_sheet.flip.x) position.x else x_other,
+        .start = if (self.flip.x) x_other else position.x,
+        .end = if (self.flip.x) position.x else x_other,
     }, .y = .{
-        .start = if (self.sprite_sheet.flip.y) y_other else position.y,
-        .end = if (self.sprite_sheet.flip.y) position.y else y_other,
+        .start = if (self.flip.y) y_other else position.y,
+        .end = if (self.flip.y) position.y else y_other,
     } };
 }
 
@@ -70,7 +73,9 @@ pub fn vertices(self: *const @This(), to_position: SDL.PointF) [4]SDL.Vertex {
     // .tex_coord = .{ .x = 1, .y = 1 },
     //
     // &[_]u32{ 0, 1, 2, 0, 2, 3 },
+    // p("Pos {}", .{to_position});
     const position = self.positionCoords(to_position);
+    // const position = Coords{};
     return [4]SDL.Vertex{
         .{
             .position = .{ .x = position.x.start, .y = position.y.end },

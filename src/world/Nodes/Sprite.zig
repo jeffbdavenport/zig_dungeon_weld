@@ -3,7 +3,6 @@ const SDL = main.SDL;
 const world = main.world;
 const SpriteSheet = main.SpriteSheet;
 
-node: world.Node = world.Node{},
 tile: SpriteSheet.Tile,
 
 // pub fn new() @This() {
