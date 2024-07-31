@@ -76,6 +76,14 @@ pub fn toI8(float: anytype) i8 {
     return @as(i8, @intFromFloat(float));
 }
 
+pub fn positionAdd(first: SDL.PointF, second: SDL.PointF) SDL.PointF {
+    return SDL.PointF{ .x = first.x + second.x, .y = first.y + second.y };
+}
+
+pub fn positionSub(first: SDL.PointF, second: SDL.PointF) SDL.PointF {
+    return SDL.PointF{ .x = first.x - second.x, .y = first.y - second.y };
+}
+
 pub fn Size(comptime T: type) type {
     return struct {
         width: T,

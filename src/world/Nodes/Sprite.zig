@@ -1,4 +1,4 @@
-const main = @import("../main.zig");
+const main = @import("../../main.zig");
 const SDL = main.SDL;
 const world = main.world;
 const SpriteSheet = main.SpriteSheet;

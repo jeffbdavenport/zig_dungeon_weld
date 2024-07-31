@@ -23,7 +23,7 @@ pub var texture: SDL.Texture = undefined;
 sdl: SDL.Window,
 renderer: Renderer,
 
-pub fn run(self: *@This(), renderPrepFunc: fn () main.Error!void, physicsFunc: fn () main.Error!void, eventFunc: fn (SDL.Event) main.Error!void) !void {
+pub fn run(self: *@This(), renderPrepFunc: fn () main.Error!world.Node.NodeType, physicsFunc: fn () main.Error!void, eventFunc: fn (SDL.Event) main.Error!void) !void {
     // devices.initKeyboard(self);
     const thread1 = try std.Thread.spawn(.{}, display.Renderer.renderLoop, .{ &self.renderer, renderPrepFunc });
     thread1.detach();

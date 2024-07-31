@@ -9,6 +9,8 @@ const SpriteSheet = main.SpriteSheet;
 
 const p = main.p;
 const toI = main.toI;
+const positionAdd = main.positionAdd;
+const positionSub = main.positionSub;
 const nanotime = main.nanotime;
 const Timesync = main.Timesync;
 const Size = main.Size;
@@ -38,7 +40,7 @@ pub fn elapsedS() u64 {
     return _elapsed_ns / std.time.ns_per_s;
 }
 
-var arena: std.heap.ArenaAllocator = undefined;
+pub var arena: std.heap.ArenaAllocator = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
 
 geometry: display.Geometry = undefined,
 prev_geometry: display.Geometry = undefined,
@@ -57,11 +59,10 @@ pub fn cleanup(self: *@This()) void {
 }
 
 // Main loop for handling when non-printing render logic should happen (Should not need to change)
-pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
+pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!world.Node.NodeType) !void {
     var render_sync = Timesync.new(std.time.ns_per_s / @as(u64, target_fps));
     var one_second = Timesync.new(std.time.ns_per_s);
 
-    arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
     self.geometry = display.Geometry.new(&arena, &display.Window.texture);
 
     while (!display.Window.exit) {
@@ -78,7 +79,7 @@ pub fn renderLoop(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
     }
 }
 
-pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
+pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!world.Node.NodeType) !void {
     if (!self.draw and !display.Window.exit) {
         // arena.deinit();
         // arena = std.heap.ArenaAllocator.init(std.heap.raw_c_allocator);
@@ -91,7 +92,8 @@ pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
         // }
         //try self.render();
         try self.geometry.reset();
-        try renderPrepFunc();
+        const root = try renderPrepFunc();
+        try self.processTree(root);
         self.draw = self.geometry.hasUpdated();
 
         // arena.deinit();
@@ -99,6 +101,33 @@ pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!void) !void {
         // self.prev_geometry = self.geometry;
     }
 }
+
+pub fn processTree(self: *@This(), node: world.Node.NodeType) !void {
+    switch (node) {
+        .node => |n| for (n.nodes.items) |item| {
+            try self.processTree(item);
+        },
+        .sprite => |s| {
+            for (s.node.nodes.items) |item| {
+                try self.processTree(item);
+            }
+            if (world.Camera.active) |camera| {
+                try self.geometry.addTile(s.tile, positionAdd(camera.topLeft(), positionSub(s.node.globalPosition(), camera.node.globalPosition())));
+                // try self.geometry.addTile(s.tile, s.node.position); //globalPosition());
+            } else {
+                try self.geometry.addTile(s.tile, s.node.position);
+            }
+        },
+        .camera => |c| if (world.Camera.active == null) {
+            for (c.node.nodes.items) |item| {
+                try self.processTree(item);
+            }
+            world.Camera.active = c;
+            // self.draw = true;
+        },
+    }
+}
+
 // try self.sdl.copy(texture, SDL.Rectangle{ .x = 0, .y = 0, .width = 1092, .height = 464 }, null);
 
 // Main loop for actual drawing (Should not need to change)
