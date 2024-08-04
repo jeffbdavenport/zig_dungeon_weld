@@ -4,8 +4,7 @@ const SDL = main.SDL;
 const world = main.world;
 const SpriteSheet = main.SpriteSheet;
 
-pub var active: ?*@This() = null;
-pub var node: ?*world.Node = null;
+pub var active: ?*world.Node = undefined;
 
 size: main.Size(f32),
 

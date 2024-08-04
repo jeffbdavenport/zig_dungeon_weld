@@ -103,13 +103,14 @@ pub fn renderPrep(self: *@This(), renderPrepFunc: fn () main.Error!world.Node) !
 }
 
 pub fn processTree(self: *@This(), node: *world.Node) !void {
-    for (node.nodes.items) |item| {
-        try self.processTree(item);
+    for (0..node.nodes.items.len) |item| {
+        try self.processTree(&node.nodes.items[item]);
     }
-    switch (node.holder) {
-        .sprite => |s| {
-            if (world.Camera.active) |camera| {
-                if (world.Camera.node) |c_node| {
+    if (node.holder) |holder| {
+        switch (holder) {
+            .sprite => |s| {
+                if (world.Camera.active) |c_node| {
+                    var camera = c_node.holder.?.camera;
                     try self.geometry.addTile(s.tile, positionAdd(
                         positionAdd(
                             camera.topLeft(),
@@ -117,15 +118,12 @@ pub fn processTree(self: *@This(), node: *world.Node) !void {
                         ),
                         c_node.offset,
                     ));
+                } else {
+                    try self.geometry.addTile(s.tile, node.globalPosition());
                 }
-            } else {
-                try self.geometry.addTile(s.tile, node.globalPosition());
-            }
-        },
-        .camera => |c| if (world.Camera.active == null) {
-            world.Camera.active = @constCast(&c);
-            world.Camera.node = node;
-        },
+            },
+            .camera => {},
+        }
     }
 }
 

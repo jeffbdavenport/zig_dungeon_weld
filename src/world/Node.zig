@@ -9,23 +9,27 @@ pub var arena: std.heap.ArenaAllocator = std.heap.ArenaAllocator.init(std.heap.r
 
 position: SDL.PointF = .{},
 offset: SDL.PointF = .{},
-nodes: std.ArrayList(*@This()) = std.ArrayList(*@This()).init(arena.allocator()),
-holder: NodeType = undefined,
-parent: *@This() = undefined,
-is_root: bool = true,
+nodes: std.ArrayList(@This()) = std.ArrayList(@This()).init(arena.allocator()),
+holder: ?NodeType = null,
+parent: ?*@This() = null,
 
 pub const NodeType = union(enum) {
     sprite: world.Sprite,
     camera: world.Camera,
 };
 
-pub fn addNode(self: *@This(), node: *@This()) !void {
-    try self.nodes.append(node);
-    node.parent = self;
-    node.is_root = false;
+pub fn addNodeGetPtr(self: *@This(), node: @This()) !*@This() {
+    var ref: *@This() = try self.nodes.addOne();
+    ref.* = node;
+    ref.parent = self;
+    return ref;
 }
-pub fn globalPosition(self: @This()) SDL.PointF {
-    const holder_position = if (self.is_root) SDL.PointF{} else self.parent.globalPosition();
+
+pub fn addNode(self: *@This(), node: @This()) !void {
+    _ = try self.addNodeGetPtr(node);
+}
+pub fn globalPosition(self: *@This()) SDL.PointF {
+    const holder_position = if (self.parent) |p| p.globalPosition() else SDL.PointF{};
     return positionAdd(self.position, holder_position);
 }
 
